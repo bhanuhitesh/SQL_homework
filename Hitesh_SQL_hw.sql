@@ -140,11 +140,11 @@ select*from language limit 10;
 -- 7a) ???Use subqueries to display the titles of movies starting with the letters `K` and `Q` whose language is English. 
 select language_id
 from language
-where name IN
+where name = 'English' IN
 (
 select film_id 
 from film 
-where title Like 'K%'
+where title Like 'K%' or title like 'Q%'
 );
  
  
@@ -186,6 +186,42 @@ where title Like 'K%'
  
  -- 7e) Display the most frequently rented movies in descending order
  
+select film.title, count(film.title) as number_rentals
+from film
+join inventory
+on film.film_id = inventory.film_id
+join rental 
+on inventory.inventory_id = rental.inventory_id
+group by film.title
+order by number_rentals desc;
  
- 
- 
+-- 7g. Write a query to display for each store its storeID, city, and country.
+select*from store;
+select store.store_id, city.city, country.country
+from store
+join address on store.address_id = address.address_id
+join city on city.city_id = address.city_id
+join country on country.country_id = city.country_id; 
+    
+-- 7h)
+
+select category.name, sum(payment.amount) as total
+from payment
+join rental on payment.customer_id = rental.customer_id
+join inventory on rental.inventory_id = inventory.inventory_id
+join film_category on inventory.film_id = film_category.film_id
+join category on film_category.category_id = category.category_id
+group by category.category_id
+order by total desc;
+
+-- 8a)
+create view top_five_genres(
+select category.name, sum(payment.amount) as total
+from payment
+join rental on payment.customer_id = rental.customer_id
+join inventory on rental.inventory_id = inventory.inventory_id
+join film_category on inventory.film_id = film_category.film_id
+join category on film_category.category_id = category.category_id
+group by category.category_id
+order by total desc
+limit 5);
